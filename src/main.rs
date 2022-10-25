@@ -1,42 +1,31 @@
-use std::collections::HashMap;
-use std::error::Error;
-use rocket::{get, main, routes};
+use rocket::{get, post, put, delete, routes};
 
-// #[get("/")]
-// async fn index() -> String {
-//     "hello rust!".to_string()
-// }
-//
-// #[allow(unused)]
-// #[main]
-// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//     rocket::build()
-//         .mount("/", routes![hello])
-//         .launch().await?;
-//
-//     Ok(())
-// }
+#[get("/")]
+fn test_get() -> String {
+    "re: get".to_string()
+}
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    let client = reqwest::Client::new();
+#[post("/")]
+fn test_post() -> String {
+    "re: post".to_string()
+}
 
-    let mut body = HashMap::new();
-    body.insert("receive_id", "oc_51c8c6584bf4c1a3b01723bdec14d2da");
-    body.insert("msg_type", "text");
-    body.insert("content", "{\"text\":\"111\"}");
-    body.insert("uuid", "1");
+#[put("/<id>")]
+fn test_put(id: usize) -> String {
+    format!("re: put <{}>", id)
+}
 
-    let res = client.post("https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id")
-        .json(&body)
-        .header("Authorization", "Bearer t-g104aplaOIZDEKG3VMILKIKZBMCDKSMOEDBGIPPF")
-        .header("Content-Length", "application/json")
-        .send()
-        .await?
-        .text()
-        .await?;
+#[delete("/<id>")]
+fn test_delete(id: usize) -> String {
+    format!("re: delete <{}>", id)
+}
 
-    println!("res: {:#?}", res);
+#[allow(unused)]
+#[rocket::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    rocket::build()
+        .mount("/test", routes![test_get, test_post, test_put, test_delete])
+        .launch().await?;
 
     Ok(())
 }
