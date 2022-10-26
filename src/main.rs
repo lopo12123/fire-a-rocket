@@ -1,4 +1,4 @@
-use rocket::{get, post, put, delete, routes};
+use rocket::{get, post, put, delete, routes, catch, catchers};
 use rocket::serde::{Deserialize, Serialize};
 use rocket::serde::json::{Json, Value};
 use rocket::serde::json::serde_json::json;
@@ -51,15 +51,23 @@ fn test_body(task: Json<Task>) -> Json<Task> {
     Json(task)
 }
 
+#[catch(404)]
+fn not_found() -> Value {
+    json!("404 ntf")
+}
+
 #[allow(unused)]
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     rocket::build()
+        // routes
         .mount("/test", routes![
             test_get, test_post, test_put, test_delete,
             test_json1, test_json2,
             test_body,
         ])
+        // catch
+        .register("/", catchers!(not_found))
         .launch().await?;
 
     Ok(())
